@@ -184,19 +184,19 @@ def stop_torghost():
         os.system(IpFlush)
         os.system('sudo fuser -k 9051/tcp > /dev/null 2>&1')
         print(bcolors.GREEN + '[done]' + bcolors.ENDC)
-    except Exceptios as ex:
+    except Exception as ex:
         print(f"\n[stop_thorghost] IP Table Flush Exception:\n{ex}\n")
     print(t() + ' Restarting Network manager'),
     try:
         os.system('service network-manager restart')
         print(bcolors.GREEN + '[done]' + bcolors.ENDC)
-    except Exceptios as ex:
+    except Exception as ex:
         print(f"\n[stop_thorghost] Network Manager Exception:\n{ex}\n")
     print(t() + ' Fetching current IP...')
     time.sleep(3)
     try:
         print(t() + ' CURRENT IP : ' + bcolors.GREEN + ip() + bcolors.ENDC)
-    except Exceptios as ex:
+    except Exception as ex:
         print(f"\n[stop_thorghost] Get IP Exception:\n{ex}\n")
 
 def switch_tor():
