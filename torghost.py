@@ -12,7 +12,7 @@ from stem import Signal
 from stem.control import Controller
 from packaging import version
 
-VERSION = "3.1.1"
+VERSION = "3.1.2"
 
 IP_API = "https://api.ipify.org/?format=json"
 
@@ -168,28 +168,36 @@ def start_torghost():
 
 def stop_torghost():
     print(bcolors.RED + t() + 'STOPPING torghost' + bcolors.ENDC)
-    print(t() + ' Flushing iptables, resetting to default'),
-    os.system('mv /etc/resolv.conf.bak /etc/resolv.conf')
-    IpFlush = \
+    try:
+        print(t() + ' Flushing iptables, resetting to default'),
+        os.system('mv /etc/resolv.conf.bak /etc/resolv.conf')
+        IpFlush = \
+            """
+        iptables -P INPUT ACCEPT
+        iptables -P FORWARD ACCEPT
+        iptables -P OUTPUT ACCEPT
+        iptables -t nat -F
+        iptables -t mangle -F
+        iptables -F
+        iptables -X
         """
-	iptables -P INPUT ACCEPT
-	iptables -P FORWARD ACCEPT
-	iptables -P OUTPUT ACCEPT
-	iptables -t nat -F
-	iptables -t mangle -F
-	iptables -F
-	iptables -X
-	"""
-    os.system(IpFlush)
-    os.system('sudo fuser -k 9051/tcp > /dev/null 2>&1')
-    print(bcolors.GREEN + '[done]' + bcolors.ENDC)
+        os.system(IpFlush)
+        os.system('sudo fuser -k 9051/tcp > /dev/null 2>&1')
+        print(bcolors.GREEN + '[done]' + bcolors.ENDC)
+    except Exceptios as ex:
+        print(f"\n[stop_thorghost] IP Table Flush Exception:\n{ex}\n")
     print(t() + ' Restarting Network manager'),
-    os.system('service network-manager restart')
-    print(bcolors.GREEN + '[done]' + bcolors.ENDC)
+    try:
+        os.system('service network-manager restart')
+        print(bcolors.GREEN + '[done]' + bcolors.ENDC)
+    except Exceptios as ex:
+        print(f"\n[stop_thorghost] Network Manager Exception:\n{ex}\n")
     print(t() + ' Fetching current IP...')
     time.sleep(3)
-    print(t() + ' CURRENT IP : ' + bcolors.GREEN + ip() + bcolors.ENDC)
-
+    try:
+        print(t() + ' CURRENT IP : ' + bcolors.GREEN + ip() + bcolors.ENDC)
+    except Exceptios as ex:
+        print(f"\n[stop_thorghost] Get IP Exception:\n{ex}\n")
 
 def switch_tor():
     print(t() + ' Please wait...')
